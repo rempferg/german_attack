@@ -1,0 +1,64 @@
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("fonts/PressStart2P.woff2") format("woff2");
+  font-display: swap;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #050518;
+  overflow: hidden;
+  overscroll-behavior: none;
+  height: 100%;
+  font-family: "Press Start 2P", "Courier New", monospace;
+}
+
+#stars-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+  height: 100lvh;
+  height: 100svh;
+  position: relative;
+  z-index: 1;
+}
+
+#game canvas {
+  image-rendering: pixelated;
+  border-radius: 6px;
+}
+
+#fs-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 9999;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  border: 2px solid #6677aa;
+  background: rgba(17, 17, 51, 0.75);
+  color: #aabbdd;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#fs-btn:hover {
+  background: rgba(34, 51, 102, 0.9);
+  border-color: #88aaee;
+}
