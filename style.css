@@ -7,22 +7,11 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: #050518;
+  background: radial-gradient(circle at 50% 30%, #1b3018 0%, #0a140c 62%, #050a06 100%);
   overflow: hidden;
   overscroll-behavior: none;
   height: 100%;
   font-family: "Press Start 2P", "Courier New", monospace;
-}
-
-#stars-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  z-index: 0;
-  pointer-events: none;
 }
 
 #game {
@@ -31,26 +20,26 @@ html, body {
   height: 100lvh;
   height: 100svh;
   position: relative;
-  z-index: 1;
 }
 
 #game canvas {
   image-rendering: pixelated;
   border-radius: 6px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
 }
 
 #fs-btn {
   position: absolute;
-  bottom: 14px;
-  right: 14px;
+  top: 6px;
+  right: 6px;
   z-index: 9999;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  border: 2px solid #6677aa;
-  background: rgba(17, 17, 51, 0.75);
-  color: #aabbdd;
-  font-size: 22px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 2px solid #667a5c;
+  background: rgba(17, 30, 18, 0.75);
+  color: #cfdcbc;
+  font-size: 16px;
   line-height: 1;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
@@ -59,6 +48,6 @@ html, body {
 }
 
 #fs-btn:hover {
-  background: rgba(34, 51, 102, 0.9);
-  border-color: #88aaee;
+  background: rgba(34, 58, 36, 0.92);
+  border-color: #93ad82;
 }

@@ -3,20 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>German Attack — Hello World</title>
+  <meta name="theme-color" content="#0a140c">
+  <title>German Attack</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="stars-bg"></canvas>
   <div id="game">
     <button id="fs-btn" aria-label="Toggle fullscreen">⛶</button>
   </div>
 
   <script src="js/phaser.min.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/save.js"></script>
+  <script src="js/german.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/stars.js"></script>
-  <script src="js/scenes/hello.js"></script>
+  <script src="js/levels/core.js"></script>
+  <script src="js/levels/level-01.js"></script>
+  <script src="js/levels/level-02.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/scenes/menu.js"></script>
+  <script src="js/scenes/levels.js"></script>
+  <script src="js/scenes/quiz.js"></script>
+  <script src="js/scenes/level.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

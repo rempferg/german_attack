@@ -9,7 +9,7 @@ window.MB = window.MB || {};
     width: C.WIDTH,
     height: C.HEIGHT,
     parent: "game",
-    backgroundColor: "#050518",
+    backgroundColor: "#0a140c",
     fps: {
       // Keep simulation speed tied to real time on slow devices: Phaser's
       // focus-regain cooldown would otherwise run the game in slow motion
@@ -23,7 +23,12 @@ window.MB = window.MB || {};
       autoCenter: Phaser.Scale.CENTER_BOTH,
       fullscreenTarget: "#game"
     },
-    scene: [MB.Scenes.Hello]
+    scene: [
+      MB.Scenes.Menu,
+      MB.Scenes.Levels,
+      MB.Scenes.Level,
+      MB.Scenes.Quiz
+    ]
   };
 
   function refreshScale() {

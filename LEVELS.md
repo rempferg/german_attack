@@ -1,0 +1,171 @@
+# Level format
+
+A level is a plain JavaScript object passed to `MB.Levels.define`. The engine
+reads it without any level-specific scene code, so maps can be added or edited
+in parallel with scene work.
+
+Coordinates are in the game's 960 x 540 canvas. The top 42 px and bottom 108 px
+are covered by the HUD; keep roads, units and scenery between roughly `y = 50`
+and `y = 430`. The player camp is normally on the left.
+
+## Minimal example
+
+```js
+MB.Levels.define({
+  id: "my-road",                 // unique, never change after release
+  number: 3,                     // unlock order
+  name: "My Road",
+  subtitle: "A short description for the map select card.",
+  brief: "Shown under the level name during play.",
+  seed: 42,                      // stable grass/rock scatter
+
+  theme: {
+    grass: 0x3f5c33,
+    grassDark: 0x344e2b,
+    grassLight: 0x507140,
+    path: 0xa8875c,
+    pathEdge: 0x7c6341,
+    camp: 0x355f8c,
+    campEdge: 0x79a9d6,
+    tent: 0x2b4b70,
+    flag: 0xffd24d,
+    tree: 0x2a5a32,
+    treeLight: 0x3d7a43,
+    trunk: 0x5a3f2a,
+    rock: 0x707a74,
+    rockLight: 0x95a09a,
+    bush: 0x3c6e38,
+    flower: 0xffd24d,
+    water: 0x2e5f73,
+    waterLight: 0x4a849b,
+    enemy: 0xa34a3f,
+    enemyDark: 0x6e2f28,
+    gold: 0xffd24d
+  },
+
+  pathWidth: 36,
+  playerArea: { x: 10, y: 50, w: 130, h: 370 },
+
+  // The road. The first point is inside the camp; the last is the treasure.
+  path: [
+    { x: 55, y: 380 },
+    { x: 210, y: 380 },
+    { x: 210, y: 170 },
+    { x: 900, y: 170 }
+  ],
+
+  treasure: { x: 900, y: 170 },
+
+  defenses: [
+    { type: "tower", x: 280, y: 275 },
+    { type: "ballista", x: 600, y: 275 }
+  ],
+
+  scenery: [
+    { type: "tree", x: 120, y: 70, scale: 1.0 },
+    { type: "rock", x: 340, y: 320, scale: 0.8 },
+    { type: "bush", x: 500, y: 120, scale: 0.9 },
+    { type: "pond", x: 700, y: 350, scale: 1.0 },
+    { type: "flower", x: 800, y: 210, scale: 0.8 }
+  ],
+
+  startingSupply: 0
+});
+```
+
+## Fields
+
+| Field | Required | Meaning |
+| ----- | -------- | ------- |
+| `id` | yes | Unique stable identifier used in the save file. |
+| `number` | no | Unlock order; defaults to load order. Cleared level `n` unlocks `n+1`. |
+| `name` | yes | Level name on the map select card and top bar. |
+| `subtitle` | no | Map select description. |
+| `brief` | no | Short objective line during play. |
+| `seed` | no | Seed for deterministic grass scatter and rock placement. |
+| `theme` | no | Palette; missing colours fall back to the default green theme. |
+| `background` | no | Path to a 960x540 image used as the ground underlay. |
+| `preload` | no | Array of `{ key, url }` images to load before the level starts. |
+| `path` | yes | Array of waypoints; at least two. |
+| `pathWidth` | no | Road width in pixels, default 36. |
+| `playerArea` | no | Camp rectangle; defaults to the left strip. |
+| `treasure` | yes | Chest centre position. |
+| `defenses` | no | Array of defensive structures. |
+| `scenery` | no | Array of decorative props. |
+| `startingSupply` | no | Supply the player starts with, default 0. |
+
+## Defenses
+
+`type` is `tower` or `ballista`. Base stats live in `js/config.js` under
+`MB.config.DEFENSES`; any stat can be overridden per placement:
+
+```js
+{ type: "tower", x: 300, y: 250, hp: 240, damage: 12, range: 200 }
+```
+
+Place defenses roughly 50-120 px from a road segment. Their range is measured
+from the structure, so a tower between two road segments covers both. A tower
+that is too far from the road can never shoot.
+
+## Scenery
+
+Built-in procedural types:
+
+- `tree`
+- `rock`
+- `bush`
+- `pond`
+- `flower`
+
+Each accepts `x`, `y`, optional `scale`, and `rotation` for textured props.
+
+To use custom art for a prop, load it in `preload` and set `texture`:
+
+```js
+preload: [{ key: "dead-tree", url: "assets/levels/my-road/dead-tree.png" }],
+scenery: [
+  { texture: "dead-tree", x: 420, y: 140, scale: 1.2 }
+]
+```
+
+A texture is used when its key is loaded; otherwise the procedural `type` is
+drawn as a fallback. Add a new procedural type by adding a case in
+`drawScenery` and a drawing function in `js/art.js`.
+
+## Adding a level
+
+1. Copy `js/levels/level-01.js` to a new file and change `id`, `number`, path,
+   theme, defenses and scenery.
+2. Add one `<script>` tag in `index.html` after `js/levels/core.js` and before
+   `js/art.js`.
+3. Test it with the local server or a preview branch.
+
+No scene code changes are needed. Extra levels beyond four get pagination in
+the map select automatically.
+
+## Improving the graphics
+
+The art layer is deliberately separate:
+
+- `background` plus `skipGround` gives a hand-painted ground while the engine
+  keeps drawing the functional road, camp and treasure.
+- `preload` + `texture` replaces individual scenery props.
+- `js/art.js` holds the drawing code for units, towers, ballistae, the camp,
+  the chest and the generated ground. Replace those functions to change the
+  look globally without touching level data.
+
+If you replace the ground entirely, keep the visual road aligned with the
+`path` data; units fight along the path, not along painted pixels.
+
+## Balance
+
+Unit and defense stats are in `js/config.js`:
+
+- `MB.config.UNITS.landsknecht`
+- `MB.config.UNITS.archer`
+- `MB.config.DEFENSES.tower`
+- `MB.config.DEFENSES.ballista`
+
+`cost` is measured in correct German answers. A map's difficulty comes from the
+number and mix of defenses, their distance from the road, and the amount of
+supply a player is willing to earn before attacking.

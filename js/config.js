@@ -11,13 +11,77 @@ MB.config = (function () {
   // Appended to asset URLs by the Dockerfile. Bump it whenever js/, style.css
   // or fonts/ change, because those files are served with a one-year immutable
   // cache while index.html itself is never cached.
-  const VERSION = "V1";
+  const VERSION = "V2";
+
+  // Supply is earned by answering German questions. Units spend it, so a unit
+  // that costs 3 needs three correct answers before it can be trained.
+  const SUPPLY_PER_ANSWER = 1;
+
+  const UNITS = {
+    landsknecht: {
+      id: "landsknecht",
+      name: "Landsknecht",
+      cost: 1,
+      hp: 140,
+      damage: 9,
+      fireRate: 900,
+      range: 150,
+      speed: 62,
+      size: 10,
+      color: 0x6f9fe0,
+      accent: 0xdbe8ff,
+      desc: "Sturdy frontline fighter."
+    },
+    archer: {
+      id: "archer",
+      name: "Archer",
+      cost: 3,
+      hp: 70,
+      damage: 22,
+      fireRate: 650,
+      range: 215,
+      speed: 70,
+      size: 9,
+      color: 0x75c46f,
+      accent: 0xe6ffd9,
+      desc: "Fragile, high damage."
+    }
+  };
+
+  const UNIT_ORDER = ["landsknecht", "archer"];
+
+  const DEFENSES = {
+    tower: {
+      name: "Watchtower",
+      hp: 180,
+      damage: 9,
+      range: 185,
+      fireRate: 1200,
+      projectileSpeed: 300,
+      size: 22,
+      color: 0xa34a3f
+    },
+    ballista: {
+      name: "Ballista",
+      hp: 280,
+      damage: 20,
+      range: 220,
+      fireRate: 2200,
+      projectileSpeed: 380,
+      size: 26,
+      color: 0x8a5a32
+    }
+  };
 
   return {
     WIDTH: WIDTH,
     HEIGHT: HEIGHT,
     FONT: FONT,
+    VERSION: VERSION,
     TITLE: "German Attack",
-    VERSION: VERSION
+    SUPPLY_PER_ANSWER: SUPPLY_PER_ANSWER,
+    UNITS: UNITS,
+    UNIT_ORDER: UNIT_ORDER,
+    DEFENSES: DEFENSES
   };
 })();

@@ -1,0 +1,102 @@
+window.MB = window.MB || {};
+
+// Level data only: no scene code in here. See LEVELS.md for the schema.
+MB.Levels.define({
+  id: "amber-pass",
+  number: 2,
+  name: "Amber Pass",
+  subtitle: "Autumn woods, two ballistae.",
+  brief: "Six defenses block the road.",
+  seed: 29,
+
+  theme: {
+    grass: 0x5c5a31,
+    grassDark: 0x494726,
+    grassLight: 0x72703d,
+    path: 0xb59a6a,
+    pathEdge: 0x846c48,
+    camp: 0x315c5b,
+    campEdge: 0x70b0aa,
+    tent: 0x234b4a,
+    flag: 0xffd24d,
+    tree: 0x8a5226,
+    treeLight: 0xb77931,
+    trunk: 0x543522,
+    rock: 0x77705f,
+    rockLight: 0x9d947d,
+    bush: 0x6a682f,
+    flower: 0xe6a33c,
+    water: 0x2e5c66,
+    waterLight: 0x4a8690,
+    enemy: 0x9d4636,
+    enemyDark: 0x65291f,
+    gold: 0xffd24d
+  },
+
+  pathWidth: 36,
+  playerArea: { x: 10, y: 50, w: 130, h: 370 },
+  path: [
+    { x: 55, y: 110 },
+    { x: 150, y: 110 },
+    { x: 150, y: 340 },
+    { x: 290, y: 340 },
+    { x: 290, y: 110 },
+    { x: 430, y: 110 },
+    { x: 430, y: 340 },
+    { x: 570, y: 340 },
+    { x: 570, y: 110 },
+    { x: 710, y: 110 },
+    { x: 710, y: 340 },
+    { x: 850, y: 340 },
+    { x: 900, y: 340 }
+  ],
+
+  treasure: { x: 900, y: 340 },
+
+  defenses: [
+    { type: "tower", x: 205, y: 225 },
+    { type: "tower", x: 345, y: 225 },
+    { type: "ballista", x: 485, y: 225 },
+    { type: "tower", x: 625, y: 225 },
+    { type: "ballista", x: 765, y: 225 },
+    { type: "tower", x: 815, y: 402 }
+  ],
+
+  scenery: [
+    { type: "tree", x: 50, y: 65, scale: 1.0 },
+    { type: "tree", x: 112, y: 62, scale: 0.82 },
+    { type: "tree", x: 180, y: 68, scale: 1.05 },
+    { type: "tree", x: 245, y: 62, scale: 0.88 },
+    { type: "tree", x: 325, y: 66, scale: 1.0 },
+    { type: "tree", x: 390, y: 62, scale: 0.84 },
+    { type: "tree", x: 470, y: 68, scale: 1.1 },
+    { type: "tree", x: 535, y: 62, scale: 0.86 },
+    { type: "tree", x: 615, y: 66, scale: 1.02 },
+    { type: "tree", x: 680, y: 62, scale: 0.82 },
+    { type: "tree", x: 760, y: 68, scale: 1.08 },
+    { type: "tree", x: 825, y: 62, scale: 0.88 },
+    { type: "tree", x: 895, y: 66, scale: 1.0 },
+    { type: "tree", x: 940, y: 150, scale: 0.9 },
+    { type: "tree", x: 175, y: 400, scale: 0.9 },
+    { type: "tree", x: 265, y: 405, scale: 0.8 },
+    { type: "tree", x: 365, y: 400, scale: 1.0 },
+    { type: "tree", x: 510, y: 405, scale: 0.85 },
+    { type: "tree", x: 655, y: 400, scale: 0.95 },
+    { type: "tree", x: 745, y: 405, scale: 0.8 },
+    { type: "tree", x: 890, y: 405, scale: 0.9 },
+    { type: "pond", x: 220, y: 290, scale: 0.9 },
+    { type: "pond", x: 780, y: 320, scale: 0.75 },
+    { type: "rock", x: 250, y: 190, scale: 0.7 },
+    { type: "rock", x: 385, y: 190, scale: 0.8 },
+    { type: "rock", x: 520, y: 190, scale: 0.7 },
+    { type: "rock", x: 660, y: 190, scale: 0.8 },
+    { type: "bush", x: 195, y: 150, scale: 0.8 },
+    { type: "bush", x: 330, y: 300, scale: 0.9 },
+    { type: "bush", x: 600, y: 300, scale: 0.8 },
+    { type: "bush", x: 750, y: 150, scale: 0.9 },
+    { type: "flower", x: 250, y: 330, scale: 0.8 },
+    { type: "flower", x: 690, y: 300, scale: 0.9 },
+    { type: "flower", x: 860, y: 150, scale: 0.8 },
+    { type: "flower", x: 940, y: 250, scale: 0.9 }
+  ]
+});
