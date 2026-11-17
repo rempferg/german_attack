@@ -49,6 +49,8 @@ MB.Scenes.Level = new Phaser.Class({
     C.UNIT_ORDER.forEach(function (id) { this.army[id] = 0; }, this);
 
     this.units = [];
+    this.campUnits = [];
+    this.campTweens = [];
     this.projectiles = [];
     this.defenses = [];
     this.correctAnswers = 0;
@@ -251,8 +253,51 @@ MB.Scenes.Level = new Phaser.Class({
     }
     this.supply -= def.cost;
     this.army[kind] += 1;
+    this.addCampUnit(kind);
     MB.audio.click();
     this.buildHud();
+  },
+
+  campSlot: function (index) {
+    const area = this.level.playerArea;
+    const start = this.path.points[0];
+    const startBottom = start.y > area.y + area.h / 2;
+    const col = index % 3;
+    const row = Math.floor(index / 3);
+    const x = area.x + 30 + col * 34;
+    const y = startBottom
+      ? start.y - 36 - row * 22
+      : start.y + 36 + row * 22;
+    return {
+      x: x,
+      y: Phaser.Math.Clamp(y, area.y + 26, area.y + area.h - 26)
+    };
+  },
+
+  addCampUnit: function (kind) {
+    const def = MB.config.UNITS[kind];
+    const spot = this.campSlot(this.campUnits.length);
+    const g = MB.art.drawUnit(this, kind, def)
+      .setDepth(8)
+      .setPosition(spot.x, spot.y)
+      .setScale(0.45)
+      .setAlpha(0);
+    this.campUnits.push(g);
+    this.campTweens.push(this.tweens.add({
+      targets: g,
+      scaleX: 1,
+      scaleY: 1,
+      alpha: 1,
+      duration: 220,
+      ease: "Back.easeOut"
+    }));
+  },
+
+  clearCampUnits: function () {
+    for (let i = 0; i < this.campTweens.length; i++) this.campTweens[i].stop();
+    this.campTweens = [];
+    for (let i = 0; i < this.campUnits.length; i++) this.campUnits[i].destroy();
+    this.campUnits = [];
   },
 
   openQuiz: function () {
@@ -284,6 +329,7 @@ MB.Scenes.Level = new Phaser.Class({
     this.defeatTimer = 0;
     MB.audio.unlock();
     MB.audio.click();
+    this.clearCampUnits();
     this.spawnArmy();
     this.buildHud();
     this.toast("The army marches!", "#ffd24d");
@@ -307,12 +353,9 @@ MB.Scenes.Level = new Phaser.Class({
         });
         const col = slot % 3;
         const row = Math.floor(slot / 3);
-        const sx = area.x + 30 + col * 34;
-        const sy = Phaser.Math.Clamp(
-          start.y + (row - 2) * 18,
-          area.y + 28,
-          area.y + area.h - 28
-        );
+        const spot = this.campSlot(slot);
+        const sx = spot.x;
+        const sy = spot.y;
         const u = {
           kind: kind,
           def: def,
@@ -830,6 +873,7 @@ MB.Scenes.Level = new Phaser.Class({
       if (u.bar) u.bar.destroy();
     });
     this.units = [];
+    this.clearCampUnits();
 
     this.projectiles.forEach(function (p) { p.g.destroy(); });
     this.projectiles = [];

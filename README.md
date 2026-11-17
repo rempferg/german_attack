@@ -20,6 +20,9 @@ The game ships with two levels:
 2. Spend supply on units:
    - **Landsknecht** - 1 supply, 140 HP, 10 DPS. A sturdy frontline unit.
    - **Archer** - 3 supply, 70 HP, 34 DPS. Fragile, but much more damage.
+
+   Each purchase appears in your camp immediately. Press **ATTACK** to send
+   the whole army down the road.
 3. Press **ATTACK**. The army marches along the path. Units stop and fire at
    defenses in range; defenses fire back. Destroyed defenses stay destroyed,
    even if an attack fails.
