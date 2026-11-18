@@ -63,6 +63,7 @@ MB.Scenes.Level = new Phaser.Class({
     this.quizOpen = false;
     this.damageTexts = 0;
     this.shotCount = 0;
+    this.dinoBites = 0;
     this.overlay = null;
     this.toastText = null;
     this.toastTween = null;
@@ -573,10 +574,8 @@ MB.Scenes.Level = new Phaser.Class({
         d.g.setPosition(d.x, d.y);
         d.bar.setPosition(d.x, d.y - d.size - 14);
       } else if (d.cooldown <= 0) {
-        this.hit(target, d.damage, "enemy");
+        this.dinoBite(d, target);
         d.cooldown = d.fireRate;
-        this.spawnHit(target.x, target.y, "enemy");
-        MB.audio.alienShot();
       }
       return;
     }
@@ -687,6 +686,47 @@ MB.Scenes.Level = new Phaser.Class({
       if (target.def) this.killUnit(target);
       else this.killDefense(target);
     }
+  },
+
+  dinoBite: function (d, target) {
+    this.hit(target, d.damage, "enemy");
+    this.dinoBites += 1;
+
+    const flash = this.add.circle(target.x, target.y, 10, 0xff6a4a, 0.4).setDepth(29);
+    this.tweens.add({
+      targets: flash,
+      scaleX: 2.2,
+      scaleY: 2.2,
+      alpha: 0,
+      duration: 240,
+      onComplete: function () { flash.destroy(); }
+    });
+
+    const chomp = this.add.graphics().setDepth(30);
+    chomp.lineStyle(2, 0xffd0a0, 0.95);
+    const angle = Math.atan2(target.y - d.y, target.x - d.x);
+    const ox = target.x - Math.cos(angle) * 8;
+    const oy = target.y - Math.sin(angle) * 8;
+    chomp.beginPath();
+    chomp.arc(ox, oy, 11, angle - 0.9, angle + 0.9, false);
+    chomp.strokePath();
+    this.tweens.add({
+      targets: chomp,
+      alpha: 0,
+      duration: 220,
+      onComplete: function () { chomp.destroy(); }
+    });
+
+    this.tweens.add({
+      targets: d.g,
+      scaleX: 1.14,
+      scaleY: 0.9,
+      duration: 90,
+      yoyo: true,
+      ease: "Quad.easeOut"
+    });
+
+    MB.audio.dinoBite();
   },
 
   fleeDino: function (d) {

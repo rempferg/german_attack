@@ -11,7 +11,7 @@ MB.config = (function () {
   // Appended to asset URLs by the Dockerfile. Bump it whenever js/, style.css
   // or fonts/ change, because those files are served with a one-year immutable
   // cache while index.html itself is never cached.
-  const VERSION = "V4";
+  const VERSION = "V5";
 
   // Supply is earned by answering German questions. Units spend it, so a unit
   // that costs 3 needs three correct answers before it can be trained.
@@ -82,23 +82,23 @@ MB.config = (function () {
       hp: 90,
       damage: 10,
       range: 52,
-      aggroRange: 135,
-      fireRate: 1100,
-      speed: 78,
+      aggroRange: 300,
+      fireRate: 1000,
+      speed: 110,
       size: 15,
-      fleeAfter: 5,
+      fleeAfter: 14,
       color: 0x7aa347
     },
     stego: {
       name: "Stego",
       hp: 210,
-      damage: 8,
+      damage: 14,
       range: 56,
-      aggroRange: 125,
-      fireRate: 1500,
-      speed: 42,
+      aggroRange: 280,
+      fireRate: 1300,
+      speed: 68,
       size: 22,
-      fleeAfter: 8,
+      fleeAfter: 22,
       color: 0x6f8f58
     },
     trex: {
@@ -106,11 +106,11 @@ MB.config = (function () {
       hp: 340,
       damage: 22,
       range: 70,
-      aggroRange: 170,
-      fireRate: 1300,
-      speed: 55,
+      aggroRange: 360,
+      fireRate: 1100,
+      speed: 85,
       size: 28,
-      fleeAfter: 12,
+      fleeAfter: 28,
       color: 0x8f5a3a
     }
   };

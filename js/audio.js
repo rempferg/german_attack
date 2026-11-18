@@ -75,6 +75,10 @@ MB.audio = (function () {
       if (level >= 3) tone(base * 2, 0.12, "sawtooth", 0.06, base * 3);
     },
     alienShot: function () { tone(160, 0.12, "sawtooth", 0.1, 90); },
+    dinoBite: function () {
+      tone(150, 0.18, "sawtooth", 0.16, 70);
+      noise(0.1, 0.16);
+    },
     explode: function () { noise(0.35, 0.35); tone(120, 0.3, "sawtooth", 0.15, 40); },
     powerBoom: function () { noise(0.5, 0.5); tone(90, 0.45, "sawtooth", 0.18, 30); tone(140, 0.3, "square", 0.1, 60); },
     boom: function () { noise(0.7, 0.5); tone(80, 0.6, "sawtooth", 0.2, 30); },
