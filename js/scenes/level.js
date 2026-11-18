@@ -538,6 +538,9 @@ MB.Scenes.Level = new Phaser.Class({
       }
 
       if (target && best <= d.range) {
+        if (d.type === "bandit") {
+          d.g.setRotation(Math.atan2(target.y - d.y, target.x - d.x));
+        }
         this.fireProjectile(d, target, "enemy");
         d.cooldown = d.fireRate;
       } else {
