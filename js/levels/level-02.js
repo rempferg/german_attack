@@ -3,7 +3,7 @@ window.MB = window.MB || {};
 // Level data only: no scene code in here. See LEVELS.md for the schema.
 MB.Levels.define({
   id: "amber-pass",
-  number: 2,
+  number: 3,
   name: "Amber Pass",
   subtitle: "Autumn woods, two ballistae.",
   brief: "Six defenses block the road.",

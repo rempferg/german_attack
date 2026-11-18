@@ -91,6 +91,11 @@ MB.audio = (function () {
       setTimeout(function () { noise(0.4, 0.18); }, 560);
     },
     victory: function () { [392, 523, 659, 784, 1046].forEach(function (f, i) { setTimeout(function () { tone(f, 0.15, "square", 0.15); }, i * 130); }); },
+    flee: function () {
+      tone(520, 0.12, "square", 0.13, 360);
+      setTimeout(function () { tone(360, 0.14, "square", 0.12, 220); }, 100);
+      setTimeout(function () { tone(220, 0.2, "sawtooth", 0.1, 120); }, 220);
+    },
     score: function () {
       [880, 1174, 1568, 2093].forEach(function (f, i) { setTimeout(function () { tone(f, 0.08, "square", 0.13); }, i * 75); });
       setTimeout(function () { noise(0.25, 0.12); }, 300);

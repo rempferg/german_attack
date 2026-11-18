@@ -46,7 +46,7 @@ MB.Scenes.Menu = new Phaser.Class({
 
     MB.ui.addText(this, C.WIDTH / 2, 288, [
       "1. Answer German questions to earn supply.",
-      "2. Spend supply on Landsknechte and Archers.",
+      "2. Spend supply to train your army.",
       "3. March down the road and reach the treasure."
     ].join("\n"), {
       fontSize: "9px",

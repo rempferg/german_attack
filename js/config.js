@@ -11,7 +11,7 @@ MB.config = (function () {
   // Appended to asset URLs by the Dockerfile. Bump it whenever js/, style.css
   // or fonts/ change, because those files are served with a one-year immutable
   // cache while index.html itself is never cached.
-  const VERSION = "V3";
+  const VERSION = "V4";
 
   // Supply is earned by answering German questions. Units spend it, so a unit
   // that costs 3 needs three correct answers before it can be trained.
@@ -73,6 +73,48 @@ MB.config = (function () {
     }
   };
 
+  // Mobile Stone Age enemies. They bite soldiers that come close and run away
+  // after taking `fleeAfter` stones. They are placed through a level's
+  // `defenses` array, just like towers.
+  const DINOS = {
+    raptor: {
+      name: "Raptor",
+      hp: 90,
+      damage: 10,
+      range: 52,
+      aggroRange: 135,
+      fireRate: 1100,
+      speed: 78,
+      size: 15,
+      fleeAfter: 5,
+      color: 0x7aa347
+    },
+    stego: {
+      name: "Stego",
+      hp: 210,
+      damage: 8,
+      range: 56,
+      aggroRange: 125,
+      fireRate: 1500,
+      speed: 42,
+      size: 22,
+      fleeAfter: 8,
+      color: 0x6f8f58
+    },
+    trex: {
+      name: "T-Rex",
+      hp: 340,
+      damage: 22,
+      range: 70,
+      aggroRange: 170,
+      fireRate: 1300,
+      speed: 55,
+      size: 28,
+      fleeAfter: 12,
+      color: 0x8f5a3a
+    }
+  };
+
   return {
     WIDTH: WIDTH,
     HEIGHT: HEIGHT,
@@ -82,6 +124,7 @@ MB.config = (function () {
     SUPPLY_PER_ANSWER: SUPPLY_PER_ANSWER,
     UNITS: UNITS,
     UNIT_ORDER: UNIT_ORDER,
-    DEFENSES: DEFENSES
+    DEFENSES: DEFENSES,
+    DINOS: DINOS
   };
 })();

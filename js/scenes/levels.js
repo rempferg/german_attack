@@ -103,6 +103,7 @@ MB.Scenes.Levels = new Phaser.Class({
 
   isUnlocked: function (index) {
     if (index <= 0) return true;
+    if (MB.save.isComplete(this.state, this.levels[index].id)) return true;
     const previous = this.levels[index - 1];
     return MB.save.isComplete(this.state, previous.id);
   },

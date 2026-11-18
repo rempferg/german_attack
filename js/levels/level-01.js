@@ -3,7 +3,7 @@ window.MB = window.MB || {};
 // Level data only: no scene code in here. See LEVELS.md for the schema.
 MB.Levels.define({
   id: "old-road",
-  number: 1,
+  number: 2,
   name: "The Old Road",
   subtitle: "Fields and fences on the way to the old chest.",
   brief: "Five defenses guard the road.",

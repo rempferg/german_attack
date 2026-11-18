@@ -197,6 +197,70 @@ MB.art = (function () {
     g.fillCircle(x + 3 * s, y - 5 * s, 1.8 * s);
   }
 
+  function drawFern(g, item, theme) {
+    const s = item.scale || 1;
+    const x = item.x;
+    const y = item.y;
+    const leaf = colour(theme, "treeLight");
+    g.fillStyle(0x000000, 0.14);
+    g.fillEllipse(x + 2 * s, y + 5 * s, 28 * s, 8 * s);
+    for (let i = 0; i < 5; i++) {
+      const angle = -Math.PI / 2 + (i - 2) * 0.42;
+      const len = (16 + (i % 2) * 5) * s;
+      const tipX = x + Math.cos(angle) * len;
+      const tipY = y + Math.sin(angle) * len;
+      g.lineStyle(2, leaf, 0.95);
+      g.lineBetween(x, y, tipX, tipY);
+      g.fillStyle(leaf, 0.9);
+      g.fillCircle(tipX, tipY, 2.4 * s);
+      g.fillCircle(x + Math.cos(angle) * len * 0.55, y + Math.sin(angle) * len * 0.55, 1.6 * s);
+    }
+  }
+
+  function drawBones(g, item, theme) {
+    const s = item.scale || 1;
+    const x = item.x;
+    const y = item.y;
+    const bone = 0xe7dfc6;
+    g.fillStyle(0x000000, 0.12);
+    g.fillEllipse(x + 2 * s, y + 6 * s, 34 * s, 8 * s);
+    g.fillStyle(bone, 1);
+    g.fillCircle(x - 9 * s, y - 2 * s, 5.5 * s);
+    g.fillRect(x - 10 * s, y + 2 * s, 11 * s, 4 * s);
+    g.fillStyle(0x3b3528, 1);
+    g.fillCircle(x - 11 * s, y - 3 * s, 1.5 * s);
+    g.fillCircle(x - 6 * s, y - 3 * s, 1.5 * s);
+    g.lineStyle(2, bone, 0.95);
+    g.lineBetween(x - 3 * s, y + 1 * s, x + 16 * s, y + 1 * s);
+    for (let i = 0; i < 4; i++) {
+      const rx = x + 1 * s + i * 4 * s;
+      g.lineBetween(rx, y + 1 * s, rx - 2 * s, y - 7 * s);
+      g.lineBetween(rx, y + 1 * s, rx - 2 * s, y + 9 * s);
+    }
+  }
+
+  function drawCampfire(g, item, theme) {
+    const s = item.scale || 1;
+    const x = item.x;
+    const y = item.y;
+    g.fillStyle(0x000000, 0.16);
+    g.fillEllipse(x, y + 4 * s, 30 * s, 10 * s);
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      g.fillStyle(colour(theme, "rock"), 1);
+      g.fillCircle(x + Math.cos(a) * 12 * s, y + Math.sin(a) * 6 * s, 3.4 * s);
+    }
+    g.lineStyle(3, colour(theme, "trunk"), 1);
+    g.lineBetween(x - 8 * s, y + 2 * s, x + 8 * s, y - 1 * s);
+    g.lineBetween(x - 8 * s, y - 1 * s, x + 8 * s, y + 2 * s);
+    g.fillStyle(0xe0692c, 1);
+    g.fillTriangle(x - 7 * s, y, x, y - 16 * s, x + 7 * s, y);
+    g.fillStyle(0xffb43c, 1);
+    g.fillTriangle(x - 4 * s, y, x + 1 * s, y - 10 * s, x + 4 * s, y);
+    g.fillStyle(0xffef9e, 1);
+    g.fillCircle(x, y - 3 * s, 1.8 * s);
+  }
+
   function drawScenery(scene, g, level, theme, baseDepth) {
     const items = level.scenery || [];
     for (let i = 0; i < items.length; i++) {
@@ -213,6 +277,9 @@ MB.art = (function () {
         case "bush": drawBush(g, item, theme); break;
         case "pond": drawPond(g, item, theme); break;
         case "flower": drawFlower(g, item, theme); break;
+        case "fern": drawFern(g, item, theme); break;
+        case "bones": drawBones(g, item, theme); break;
+        case "campfire": drawCampfire(g, item, theme); break;
         case "tree":
         default: drawTree(g, item, theme); break;
       }
@@ -317,7 +384,139 @@ MB.art = (function () {
     return container;
   }
 
-  function drawUnit(scene, kind, def) {
+  function drawDino(scene, defense, theme, type) {
+    const container = scene.add.container(defense.x, defense.y);
+    const g = scene.add.graphics();
+    const size = defense.size || 15;
+    const color = defense.color || 0x7aa347;
+    const dark = 0x2e3b22;
+
+    g.fillStyle(0x000000, 0.22);
+    g.fillEllipse(3, size * 0.6, size * 3.2, size * 0.8);
+
+    g.fillStyle(dark, 1);
+    g.fillTriangle(-size * 1.5, 0, -size * 0.25, -size * 0.45, -size * 0.25, size * 0.45);
+
+    g.fillStyle(color, 1);
+    g.fillEllipse(0, 0, size * 2.1, size * 1.2);
+    g.lineStyle(1.5, dark, 0.85);
+    g.strokeEllipse(0, 0, size * 2.1, size * 1.2);
+
+    if (type === "stego") {
+      g.fillStyle(0x9a7a3e, 1);
+      for (let i = 0; i < 4; i++) {
+        const px = -size * 0.7 + i * size * 0.45;
+        g.fillTriangle(px - size * 0.2, -size * 0.45, px, -size * 0.95, px + size * 0.2, -size * 0.45);
+      }
+      g.fillStyle(0xcfc7a0, 1);
+      g.fillTriangle(-size * 1.1, -size * 0.15, -size * 1.55, -size * 0.55, -size * 0.95, -size * 0.35);
+      g.fillTriangle(-size * 1.1, 0.15 * size, -size * 1.55, size * 0.55, -size * 0.95, size * 0.35);
+    } else if (type === "trex") {
+      g.fillStyle(dark, 1);
+      g.fillCircle(-size * 0.45, size * 0.55, size * 0.3);
+      g.fillCircle(size * 0.25, size * 0.6, size * 0.28);
+      g.fillStyle(0x6a3d24, 1);
+      g.fillTriangle(-size * 0.3, size * 0.75, -size * 0.05, size * 1.15, 0, size * 0.7);
+      g.fillTriangle(size * 0.1, size * 0.75, size * 0.35, size * 1.1, size * 0.4, size * 0.65);
+    } else {
+      g.fillStyle(dark, 1);
+      g.fillEllipse(-size * 0.45, size * 0.55, size * 0.55, size * 0.8);
+      g.fillEllipse(size * 0.35, size * 0.55, size * 0.55, size * 0.8);
+      g.lineStyle(1.5, dark, 0.55);
+      g.lineBetween(-size * 0.6, -size * 0.3, -size * 0.2, -size * 0.45);
+      g.lineBetween(-size * 0.2, -size * 0.35, size * 0.2, -size * 0.42);
+    }
+
+    const headSize = type === "trex" ? size * 0.78 : type === "stego" ? size * 0.4 : size * 0.55;
+    const headX = type === "stego" ? size * 1.15 : size * 0.95;
+    const headY = type === "stego" ? -size * 0.02 : -size * 0.25;
+
+    g.fillStyle(color, 1);
+    g.fillCircle(headX, headY, headSize);
+    g.fillStyle(dark, 1);
+    if (type === "trex") {
+      g.fillTriangle(headX + headSize * 0.3, headY - headSize * 0.55,
+        headX + headSize * 1.15, headY - headSize * 0.05,
+        headX + headSize * 0.3, headY + headSize * 0.45);
+      g.fillStyle(0xffffff, 1);
+      for (let i = 0; i < 3; i++) {
+        const tx = headX + headSize * (0.5 + i * 0.18);
+        g.fillTriangle(tx, headY + headSize * 0.15, tx + 2, headY + headSize * 0.45, tx + 4, headY + headSize * 0.15);
+      }
+    } else {
+      g.fillTriangle(headX + headSize * 0.4, headY - headSize * 0.35,
+        headX + headSize * 1.35, headY,
+        headX + headSize * 0.4, headY + headSize * 0.35);
+    }
+
+    g.fillStyle(0xffe6a8, 1);
+    g.fillCircle(headX - headSize * 0.05, headY - headSize * 0.28, Math.max(1.4, size * 0.12));
+    g.fillStyle(0x1a1a1a, 1);
+    g.fillCircle(headX, headY - headSize * 0.28, Math.max(0.8, size * 0.06));
+
+    container.add(g);
+    container.setDepth(6);
+    if (defense.scale) container.setScale(defense.scale);
+    return container;
+  }
+
+  function drawStoneAgeUnit(scene, kind, def) {
+    const container = scene.add.container(0, 0);
+    const g = scene.add.graphics();
+    const size = def.size;
+
+    g.fillStyle(0x000000, 0.22);
+    g.fillEllipse(2, size * 0.5, (size + 8) * 2, size * 0.7);
+
+    g.fillStyle(0x3a2a1c, 1);
+    g.fillCircle(0, 0, size + 2);
+    g.fillStyle(0x7a5334, 1);
+    g.fillCircle(0, 0, size);
+    g.fillStyle(0x5a3c24, 1);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      g.fillTriangle(
+        Math.cos(a - 0.18) * size, Math.sin(a - 0.18) * size,
+        Math.cos(a) * (size + 4), Math.sin(a) * (size + 4),
+        Math.cos(a + 0.18) * size, Math.sin(a + 0.18) * size
+      );
+    }
+
+    g.fillStyle(0xc99a6b, 1);
+    g.fillCircle(size * 0.35, 0, size * 0.6);
+    g.fillStyle(0x4a3120, 1);
+    g.fillCircle(size * 0.2, -size * 0.08, size * 0.42);
+    g.fillStyle(def.accent, 1);
+    g.fillRect(size * 0.1, -size * 0.36, size * 0.6, 3);
+    g.fillStyle(0x1a1a1a, 1);
+    g.fillCircle(size * 0.55, -size * 0.1, Math.max(1, size * 0.1));
+
+    if (kind === "archer") {
+      g.lineStyle(2, 0xd8c8a8, 1);
+      g.beginPath();
+      g.arc(size * 0.72, 0, size * 0.62, -1.15, 1.15, false);
+      g.strokePath();
+      g.fillStyle(0x8c8c82, 1);
+      g.fillCircle(size * 1.15, 0, size * 0.24);
+    } else {
+      g.lineStyle(4, 0x5a3f2a, 1);
+      g.lineBetween(size * 0.4, 0, size + 10, 0);
+      g.fillStyle(0x6f4a2c, 1);
+      g.fillCircle(size + 11, 0, size * 0.42);
+      g.fillStyle(0x8c8c82, 1);
+      g.fillCircle(size + 11, 0, size * 0.2);
+    }
+
+    g.fillStyle(0x8c8c82, 1);
+    g.fillCircle(-size * 0.5, size * 0.5, size * 0.25);
+
+    container.add(g);
+    return container;
+  }
+
+  function drawUnit(scene, kind, def, style) {
+    if (style === "stoneage") return drawStoneAgeUnit(scene, kind, def);
+
     const container = scene.add.container(0, 0);
     const g = scene.add.graphics();
     const size = def.size;
@@ -457,12 +656,29 @@ MB.art = (function () {
     return map;
   }
 
+  function drawStone(scene, x, y) {
+    const container = scene.add.container(x, y);
+    const g = scene.add.graphics();
+    g.fillStyle(0x8c8c82, 1);
+    g.fillTriangle(-5, -3, 4, -4, 5, 3);
+    g.fillTriangle(-5, -3, 5, 3, -4, 4);
+    g.lineStyle(1, 0x4f4f47, 1);
+    g.strokeTriangle(-5, -3, 4, -4, 5, 3);
+    g.strokeTriangle(-5, -3, 5, 3, -4, 4);
+    g.fillStyle(0xd8d4c0, 0.75);
+    g.fillCircle(-1, -1, 1.3);
+    container.add(g);
+    return container;
+  }
+
   return {
     drawMap: drawMap,
     drawMiniMap: drawMiniMap,
     drawMenuBackdrop: drawMenuBackdrop,
     drawDefense: drawDefense,
+    drawDino: drawDino,
     drawUnit: drawUnit,
+    drawStone: drawStone,
     rng: rng
   };
 })();

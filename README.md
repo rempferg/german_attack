@@ -3,33 +3,36 @@
 A top-down German-learning campaign game built with Phaser 3.
 
 Answer German questions to earn supply. Spend supply on a marching army, send
-it down the road, and fight your way past towers and ballistae to the treasure.
-Clearing a map unlocks the next one.
+it down the road, and fight your way past towers, ballistae and dinosaurs to
+the treasure. Clearing a map unlocks the next one.
 
-The game ships with two levels:
+The game ships with three levels:
 
 | # | Level | Map |
 | - | ----- | --- |
-| 1 | The Old Road | Green fields, five defenses |
-| 2 | Amber Pass | Autumn woods, six defenses |
+| 1 | Stone Age | Savannah, cavemen and four dinosaurs |
+| 2 | The Old Road | Green fields, five defenses |
+| 3 | Amber Pass | Autumn woods, six defenses |
 
 ## How to play
 
 1. Press **ANSWER GERMAN** and answer as many questions as you like. Each
    correct answer earns **1 supply**.
-2. Spend supply on units:
-   - **Landsknecht** - 1 supply, 140 HP, 10 DPS. A sturdy frontline unit.
-   - **Archer** - 3 supply, 70 HP, 34 DPS. Fragile, but much more damage.
+2. Spend supply on units. The roles are the same in every level; the Stone Age
+   map calls them **Clubman** and **Slinger**:
+   - **Landsknecht / Clubman** - 1 supply, 140 HP, 10 DPS. Sturdy frontline.
+   - **Archer / Slinger** - 3 supply, 70 HP, 34 DPS. Fragile, more damage.
 
    Each purchase appears in your camp immediately. Press **ATTACK** to send
    the whole army down the road.
-3. Press **ATTACK**. The army marches along the path. Units stop and fire at
-   defenses in range; defenses fire back. Destroyed defenses stay destroyed,
-   even if an attack fails.
-4. Reach the treasure to clear the level and unlock the next map.
+3. The army marches along the path. Units stop and throw or shoot at enemies
+   in range. Towers fire back; dinosaurs bite soldiers that get close.
+4. Dinosaurs are scared off rather than killed: after a few stone hits they
+   turn and run off the map. Towers and ballistae stay destroyed once broken.
+5. Reach the treasure to clear the level and unlock the next map.
 
 A failed attack is not a dead end: answer more German, rebuild the army, and
-the already-damaged defenses stay damaged.
+anything already defeated stays out of the way.
 
 ## Run locally
 
@@ -70,13 +73,14 @@ ln -sf ~/web-app-deployment/post-receive_web-app-repos \
 ```
 index.html                     page shell and script order
 style.css                      page background and fullscreen button
-js/config.js                   canvas size, unit and defense stats, version
+js/config.js                   canvas size, unit/defense/dino stats, version
 js/main.js                     Phaser bootstrap, scaling, fullscreen
 js/ui.js                       pixel-art text, buttons, panels, HP bars
-js/art.js                      all top-down map/unit/defense drawing
+js/art.js                      all top-down map/unit/dino drawing
 js/german.js                   German question bank (152 questions)
 js/save.js                     cleared-map progress in localStorage
 js/levels/core.js              level registry and path geometry
+js/levels/level-00-stone-age.js  Stone Age
 js/levels/level-01.js          The Old Road
 js/levels/level-02.js          Amber Pass
 js/scenes/menu.js              title screen
@@ -93,9 +97,14 @@ deployment/nginx.container.conf  nginx config inside the container
 
 Levels are data, not scene code. Each level lives in its own file under
 `js/levels/` and is registered with `MB.Levels.define({...})`. A level supplies
-its own path, defenses, scenery, colours and treasure position. Add the file to
-`index.html` and it appears in the map select; the next level unlocks by
-`number` order.
+its own path, enemies, scenery, colours, unit names and treasure position. Add
+the file to `index.html` and it appears in the map select; the next level
+unlocks by `number` order.
+
+Enemy entries in `defenses` can be structures (`tower`, `ballista`) or dinos
+(`raptor`, `stego`, `trex`). Dinos walk toward nearby soldiers to bite them and
+flee after `fleeAfter` stone hits. A level can set `unitStyle: "stoneage"` to
+reskin soldiers and `playerProjectile: "stone"` to throw rocks.
 
 See [LEVELS.md](LEVELS.md) for the full schema and a minimal example.
 

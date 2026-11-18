@@ -13,7 +13,7 @@ and `y = 430`. The player camp is normally on the left.
 ```js
 MB.Levels.define({
   id: "my-road",                 // unique, never change after release
-  number: 3,                     // unlock order
+  number: 4,                     // unlock order
   name: "My Road",
   subtitle: "A short description for the map select card.",
   brief: "Shown under the level name during play.",
@@ -46,6 +46,13 @@ MB.Levels.define({
   pathWidth: 36,
   playerArea: { x: 10, y: 50, w: 130, h: 370 },
 
+  // Optional per-level presentation.
+  unitStyle: "stoneage",         // "stoneage" draws cavemen; omit for default
+  unitNames: { landsknecht: "Clubman", archer: "Slinger" },
+  playerProjectile: "stone",     // omit for energy bolts
+  enemyWord: { one: "Dino", many: "Dinos", verb: "routed" },
+  battleLine: "Keep throwing stones until the dinos run away!",
+
   // The road. The first point is inside the camp; the last is the treasure.
   path: [
     { x: 55, y: 380 },
@@ -58,7 +65,7 @@ MB.Levels.define({
 
   defenses: [
     { type: "tower", x: 280, y: 275 },
-    { type: "ballista", x: 600, y: 275 }
+    { type: "raptor", x: 600, y: 275 }
   ],
 
   scenery: [
@@ -90,22 +97,40 @@ MB.Levels.define({
 | `pathWidth` | no | Road width in pixels, default 36. |
 | `playerArea` | no | Camp rectangle; defaults to the left strip. |
 | `treasure` | yes | Chest centre position. |
-| `defenses` | no | Array of defensive structures. |
+| `defenses` | no | Array of towers, ballistae or dinos. |
 | `scenery` | no | Array of decorative props. |
 | `startingSupply` | no | Supply the player starts with, default 0. |
+| `unitStyle` | no | `"stoneage"` reskins soldiers as cavemen. |
+| `unitNames` | no | Per-unit display names, e.g. `{ landsknecht: "Clubman" }`. |
+| `playerProjectile` | no | `"stone"` makes player shots throw rocks. |
+| `enemyWord` | no | Labels for the HUD/stats: `{ one, many, verb }`. |
+| `battleLine` | no | Objective line shown in the bottom bar during battle. |
 
-## Defenses
+## Defenses and dinos
 
-`type` is `tower` or `ballista`. Base stats live in `js/config.js` under
-`MB.config.DEFENSES`; any stat can be overridden per placement:
+`type` is `tower`, `ballista`, `raptor`, `stego` or `trex`. Base stats live in
+`js/config.js` under `MB.config.DEFENSES` and `MB.config.DINOS`; any stat can be
+overridden per placement:
 
 ```js
 { type: "tower", x: 300, y: 250, hp: 240, damage: 12, range: 200 }
+{ type: "raptor", x: 420, y: 300, fleeAfter: 5 }
 ```
 
-Place defenses roughly 50-120 px from a road segment. Their range is measured
-from the structure, so a tower between two road segments covers both. A tower
-that is too far from the road can never shoot.
+Towers and ballistae stand still and shoot. Place them roughly 50-120 px from a
+road segment; their range is measured from the structure, so one between two
+road segments covers both.
+
+Dinos are mobile:
+
+- They chase soldiers within `aggroRange` and bite within `range`.
+- Every player stone that hits counts as one scare hit. The small bar above a
+  dino appears after the first hit and fills up.
+- At `fleeAfter` hits the dino runs off the map and counts as routed.
+- `hp` still exists for overrides/future use, but the flee threshold is what
+  clears the path.
+- Give them `x`, `y` near a road segment; they return there when no soldier is
+  close.
 
 ## Scenery
 
@@ -116,6 +141,9 @@ Built-in procedural types:
 - `bush`
 - `pond`
 - `flower`
+- `fern`
+- `bones`
+- `campfire`
 
 Each accepts `x`, `y`, optional `scale`, and `rotation` for textured props.
 
@@ -141,7 +169,8 @@ drawn as a fallback. Add a new procedural type by adding a case in
 3. Test it with the local server or a preview branch.
 
 No scene code changes are needed. Extra levels beyond four get pagination in
-the map select automatically.
+the map select automatically. Keep `number` unique; the existing maps are
+Stone Age (1), The Old Road (2) and Amber Pass (3).
 
 ## Improving the graphics
 
@@ -159,13 +188,16 @@ If you replace the ground entirely, keep the visual road aligned with the
 
 ## Balance
 
-Unit and defense stats are in `js/config.js`:
+Unit and enemy stats are in `js/config.js`:
 
 - `MB.config.UNITS.landsknecht`
 - `MB.config.UNITS.archer`
 - `MB.config.DEFENSES.tower`
 - `MB.config.DEFENSES.ballista`
+- `MB.config.DINOS.raptor`
+- `MB.config.DINOS.stego`
+- `MB.config.DINOS.trex`
 
 `cost` is measured in correct German answers. A map's difficulty comes from the
-number and mix of defenses, their distance from the road, and the amount of
+number and mix of enemies, their distance from the road, and the amount of
 supply a player is willing to earn before attacking.

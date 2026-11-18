@@ -43,6 +43,8 @@ MB.Scenes.Level = new Phaser.Class({
     this.levelId = this.level.id;
     this.path = MB.path.build(this.level.path);
     this.saveState = MB.save.load();
+    this.enemyWord = this.level.enemyWord || { one: "Defense", many: "Defenses", verb: "destroyed" };
+    this.battleLine = this.level.battleLine || "The army is marching to the treasure.";
     this.phase = "prepare";
     this.supply = this.level.startingSupply || 0;
     this.army = {};
@@ -86,31 +88,47 @@ MB.Scenes.Level = new Phaser.Class({
   },
 
   buildDefenses: function () {
-    const defaults = MB.config.DEFENSES;
+    const structures = MB.config.DEFENSES;
+    const dinos = MB.config.DINOS;
     this.defenses = this.level.defenses.map(function (spot, index) {
-      const base = defaults[spot.type] || defaults.tower;
+      const isDino = !!dinos[spot.type];
+      const base = isDino ? dinos[spot.type] : (structures[spot.type] || structures.tower);
       const stats = Object.assign({}, base, spot);
       const maxHp = stats.hp;
-      const visual = MB.art.drawDefense(this, stats, this.level.theme);
+      const visual = isDino
+        ? MB.art.drawDino(this, stats, this.level.theme, spot.type)
+        : MB.art.drawDefense(this, stats, this.level.theme);
       const bar = MB.ui.addHpBar(
         this,
         spot.x,
         spot.y - (stats.size + 16),
-        42,
-        5,
-        { color: 0xd96455, depth: 7 }
+        isDino ? 34 : 42,
+        isDino ? 4 : 5,
+        { color: isDino ? 0xffc46b : 0xd96455, depth: 7 }
       );
+      if (isDino) {
+        bar.setRatio(0);
+        bar.setAlpha(0);
+      }
       return {
         id: (spot.type || "tower") + "-" + index,
         type: spot.type || "tower",
         x: spot.x,
         y: spot.y,
+        homeX: spot.x,
+        homeY: spot.y,
         hp: maxHp,
         maxHp: maxHp,
         damage: stats.damage,
         range: stats.range,
         fireRate: stats.fireRate,
         projectileSpeed: stats.projectileSpeed,
+        aggroRange: stats.aggroRange || 0,
+        speed: stats.speed || 0,
+        size: stats.size || 20,
+        dino: isDino,
+        stonesTaken: 0,
+        fleeAfter: stats.fleeAfter || 4,
         cooldown: 400 + Math.random() * 700,
         g: visual,
         bar: bar,
@@ -189,7 +207,7 @@ MB.Scenes.Level = new Phaser.Class({
       const affordable = this.supply >= def.cost;
       const dps = Math.round(def.damage / def.fireRate * 1000);
       hud.add(MB.ui.addButton(this, cardX[i], 490, 152, 52,
-        def.name.toUpperCase() + "\n" +
+        this.unitName(kind).toUpperCase() + "\n" +
         def.cost + " SUPPLY · " + def.hp + " HP\n" +
         dps + " DPS · " + this.army[kind] + " READY", {
           fill: affordable ? 0x2a5a8f : 0x333d3a,
@@ -258,6 +276,10 @@ MB.Scenes.Level = new Phaser.Class({
     this.buildHud();
   },
 
+  unitName: function (kind) {
+    return (this.level.unitNames && this.level.unitNames[kind]) || MB.config.UNITS[kind].name;
+  },
+
   campSlot: function (index) {
     const area = this.level.playerArea;
     const start = this.path.points[0];
@@ -277,7 +299,7 @@ MB.Scenes.Level = new Phaser.Class({
   addCampUnit: function (kind) {
     const def = MB.config.UNITS[kind];
     const spot = this.campSlot(this.campUnits.length);
-    const g = MB.art.drawUnit(this, kind, def)
+    const g = MB.art.drawUnit(this, kind, def, this.level.unitStyle)
       .setDepth(8)
       .setPosition(spot.x, spot.y)
       .setScale(0.45)
@@ -346,7 +368,7 @@ MB.Scenes.Level = new Phaser.Class({
       const count = this.army[kind] || 0;
       for (let i = 0; i < count; i++) {
         const def = C.UNITS[kind];
-        const g = MB.art.drawUnit(this, kind, def).setDepth(10);
+        const g = MB.art.drawUnit(this, kind, def, this.level.unitStyle).setDepth(10);
         const bar = MB.ui.addHpBar(this, 0, 0, 22, 3, {
           color: 0x7ce07c,
           depth: 11
@@ -489,9 +511,14 @@ MB.Scenes.Level = new Phaser.Class({
   },
 
   updateDefenses: function (dtMs) {
+    const dtSec = dtMs / 1000;
     for (let i = 0; i < this.defenses.length; i++) {
       const d = this.defenses[i];
       if (d.dead) continue;
+      if (d.dino) {
+        this.updateDino(d, dtSec);
+        continue;
+      }
       d.cooldown -= dtMs;
       if (d.cooldown > 0) continue;
 
@@ -518,15 +545,70 @@ MB.Scenes.Level = new Phaser.Class({
     }
   },
 
+  updateDino: function (d, dtSec) {
+    d.cooldown = Math.max(0, d.cooldown - dtSec * 1000);
+
+    let target = null;
+    let best = Infinity;
+    for (let i = 0; i < this.units.length; i++) {
+      const u = this.units[i];
+      if (u.dead) continue;
+      const dx = u.x - d.x;
+      const dy = u.y - d.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < best) {
+        best = dist;
+        target = u;
+      }
+    }
+
+    if (target && best <= d.aggroRange) {
+      d.g.setRotation(Math.atan2(target.y - d.y, target.x - d.x));
+      if (best > d.range) {
+        const dx = target.x - d.x;
+        const dy = target.y - d.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        d.x = Phaser.Math.Clamp(d.x + (dx / dist) * d.speed * dtSec, 20, 940);
+        d.y = Phaser.Math.Clamp(d.y + (dy / dist) * d.speed * dtSec, 50, 425);
+        d.g.setPosition(d.x, d.y);
+        d.bar.setPosition(d.x, d.y - d.size - 14);
+      } else if (d.cooldown <= 0) {
+        this.hit(target, d.damage, "enemy");
+        d.cooldown = d.fireRate;
+        this.spawnHit(target.x, target.y, "enemy");
+        MB.audio.alienShot();
+      }
+      return;
+    }
+
+    const homeDx = d.homeX - d.x;
+    const homeDy = d.homeY - d.y;
+    const homeDist = Math.sqrt(homeDx * homeDx + homeDy * homeDy);
+    if (homeDist > 3) {
+      const step = Math.min(homeDist, d.speed * 0.45 * dtSec);
+      d.x += (homeDx / homeDist) * step;
+      d.y += (homeDy / homeDist) * step;
+      d.g.setRotation(Math.atan2(homeDy, homeDx));
+      d.g.setPosition(d.x, d.y);
+      d.bar.setPosition(d.x, d.y - d.size - 14);
+    }
+  },
+
   fireProjectile: function (source, target, side) {
     const isPlayer = side === "player";
-    const g = this.add.circle(
-      source.x,
-      source.y,
-      isPlayer ? 2.6 : 3.5,
-      isPlayer ? 0xbfe9ff : 0xffb36b,
-      1
-    ).setDepth(20);
+    const stone = isPlayer && this.level.playerProjectile === "stone";
+    let g;
+    if (stone) {
+      g = MB.art.drawStone(this, source.x, source.y).setDepth(20);
+    } else {
+      g = this.add.circle(
+        source.x,
+        source.y,
+        isPlayer ? 2.6 : 3.5,
+        isPlayer ? 0xbfe9ff : 0xffb36b,
+        1
+      ).setDepth(20);
+    }
 
     this.projectiles.push({
       g: g,
@@ -535,6 +617,8 @@ MB.Scenes.Level = new Phaser.Class({
       target: target,
       damage: source.damage,
       side: side,
+      stone: stone,
+      spin: stone ? (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 3) : 0,
       speed: isPlayer ? 520 : (source.projectileSpeed || 320)
     });
 
@@ -563,12 +647,13 @@ MB.Scenes.Level = new Phaser.Class({
 
       if (dist <= step + 4) {
         p.g.destroy();
-        this.spawnHit(target.x, target.y, p.side);
+        this.spawnHit(target.x, target.y, p.side, p.stone);
         this.hit(target, p.damage, p.side);
       } else {
         p.x += (dx / dist) * step;
         p.y += (dy / dist) * step;
         p.g.setPosition(p.x, p.y);
+        if (p.spin) p.g.rotation += p.spin * dtSec;
         survivors.push(p);
       }
     }
@@ -578,6 +663,22 @@ MB.Scenes.Level = new Phaser.Class({
 
   hit: function (target, damage, side) {
     if (!target || target.dead || target.hp <= 0) return;
+
+    if (target.dino) {
+      if (side !== "player") return;
+      target.hp -= damage;
+      target.stonesTaken += 1;
+      if (target.bar) {
+        target.bar.setAlpha(1);
+        target.bar.setRatio(Math.min(1, target.stonesTaken / target.fleeAfter));
+      }
+      this.spawnDamage(target.x, target.y - 16, damage, side);
+      if (target.stonesTaken >= target.fleeAfter || target.hp <= 0) {
+        this.fleeDino(target);
+      }
+      return;
+    }
+
     target.hp -= damage;
     if (target.bar) target.bar.setRatio(target.hp / target.maxHp);
     this.spawnDamage(target.x, target.y - 14, damage, side);
@@ -586,6 +687,54 @@ MB.Scenes.Level = new Phaser.Class({
       if (target.def) this.killUnit(target);
       else this.killDefense(target);
     }
+  },
+
+  fleeDino: function (d) {
+    if (d.dead) return;
+    d.dead = true;
+    if (d.bar) {
+      d.bar.destroy();
+      d.bar = null;
+    }
+    this.defensesDestroyed++;
+    MB.audio.flee();
+    this.spawnBurst(d.x, d.y, 0xd8c8a0);
+
+    const bang = MB.ui.addText(this, d.x, d.y - d.size - 20, "!", {
+      fontSize: "14px",
+      color: "#ffd24d",
+      stroke: "#081009",
+      strokeThickness: 3
+    }).setDepth(30);
+    this.tweens.add({
+      targets: bang,
+      y: bang.y - 22,
+      alpha: 0,
+      duration: 700,
+      onComplete: function () { bang.destroy(); }
+    });
+
+    const options = [
+      { x: -100, y: d.y + (Math.random() * 80 - 40), dist: d.x },
+      { x: 1060, y: d.y + (Math.random() * 80 - 40), dist: 960 - d.x },
+      { x: d.x + (Math.random() * 80 - 40), y: 20, dist: d.y - 42 },
+      { x: d.x + (Math.random() * 80 - 40), y: 500, dist: 432 - d.y }
+    ];
+    options.sort(function (a, b) { return a.dist - b.dist; });
+    const escape = options[0];
+
+    d.g.setRotation(Math.atan2(escape.y - d.y, escape.x - d.x));
+    this.tweens.add({
+      targets: d.g,
+      x: escape.x,
+      y: escape.y,
+      alpha: 0.05,
+      scaleX: 0.8,
+      scaleY: 0.8,
+      duration: 750 + Math.random() * 350,
+      ease: "Cubic.easeIn",
+      onComplete: function () { d.g.destroy(); }
+    });
   },
 
   killUnit: function (unit) {
@@ -632,12 +781,12 @@ MB.Scenes.Level = new Phaser.Class({
     });
   },
 
-  spawnHit: function (x, y, side) {
+  spawnHit: function (x, y, side, stone) {
     const spark = this.add.circle(
       x,
       y,
       3,
-      side === "player" ? 0xe8f6ff : 0xffc078,
+      stone ? 0xd8c8a0 : side === "player" ? 0xe8f6ff : 0xffc078,
       0.9
     ).setDepth(29);
     this.tweens.add({
@@ -672,8 +821,8 @@ MB.Scenes.Level = new Phaser.Class({
     const alive = this.units.filter(function (u) { return !u.dead; }).length;
     const left = this.defenses.filter(function (d) { return !d.dead; }).length;
     this.battleStatusText.setText(
-      "Defenses left: " + left + "     Soldiers: " + alive +
-      "\nThe army is marching to the treasure."
+      this.enemyWord.many + " left: " + left + "     Soldiers: " + alive +
+      "\n" + this.battleLine
     );
   },
 
@@ -760,12 +909,12 @@ MB.Scenes.Level = new Phaser.Class({
     const lines = victory
       ? [
           "Soldiers surviving: " + alive + " / " + totalUnits,
-          "Defenses destroyed: " + this.defensesDestroyed + " / " + this.defensesTotal,
+          this.enemyWord.many + " " + this.enemyWord.verb + ": " + this.defensesDestroyed + " / " + this.defensesTotal,
           "Correct answers earned: " + this.correctAnswers
         ]
       : [
           "Soldiers lost: " + this.unitsLost,
-          "Defenses destroyed: " + this.defensesDestroyed + " / " + this.defensesTotal,
+          this.enemyWord.many + " " + this.enemyWord.verb + ": " + this.defensesDestroyed + " / " + this.defensesTotal,
           "Supply left: " + this.supply
         ];
 
