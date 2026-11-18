@@ -261,6 +261,29 @@ MB.art = (function () {
     g.fillCircle(x, y - 3 * s, 1.8 * s);
   }
 
+  function drawCactus(g, item, theme) {
+    const s = item.scale || 1;
+    const x = item.x;
+    const y = item.y;
+    g.fillStyle(0x000000, 0.16);
+    g.fillEllipse(x + 3 * s, y + 12 * s, 26 * s, 8 * s);
+    g.fillStyle(colour(theme, "tree"), 1);
+    g.fillRoundedRect(x - 4 * s, y - 16 * s, 8 * s, 28 * s, 4 * s);
+    g.fillRoundedRect(x - 14 * s, y - 8 * s, 10 * s, 6 * s, 3 * s);
+    g.fillRoundedRect(x - 14 * s, y - 14 * s, 6 * s, 12 * s, 3 * s);
+    g.fillRoundedRect(x + 4 * s, y - 2 * s, 10 * s, 6 * s, 3 * s);
+    g.fillRoundedRect(x + 8 * s, y - 10 * s, 6 * s, 14 * s, 3 * s);
+    g.fillStyle(colour(theme, "treeLight"), 0.9);
+    g.fillRect(x - 2 * s, y - 12 * s, 2 * s, 10 * s);
+    g.lineStyle(1, 0xd8e0b8, 0.7);
+    for (let i = 0; i < 4; i++) {
+      g.lineBetween(x + 3 * s, y - 12 * s + i * 5 * s, x + 7 * s, y - 14 * s + i * 5 * s);
+      g.lineBetween(x - 3 * s, y - 10 * s + i * 5 * s, x - 7 * s, y - 12 * s + i * 5 * s);
+    }
+    g.fillStyle(colour(theme, "flower"), 1);
+    g.fillCircle(x, y - 17 * s, 2 * s);
+  }
+
   function drawScenery(scene, g, level, theme, baseDepth) {
     const items = level.scenery || [];
     for (let i = 0; i < items.length; i++) {
@@ -280,6 +303,7 @@ MB.art = (function () {
         case "fern": drawFern(g, item, theme); break;
         case "bones": drawBones(g, item, theme); break;
         case "campfire": drawCampfire(g, item, theme); break;
+        case "cactus": drawCactus(g, item, theme); break;
         case "tree":
         default: drawTree(g, item, theme); break;
       }
@@ -356,6 +380,31 @@ MB.art = (function () {
       g.fillCircle(0, 0, 6);
       g.lineStyle(2, 0x2e1c0e, 1);
       g.strokeCircle(0, 0, size + 3);
+    } else if (defense.type === "bandit") {
+      g.fillStyle(enemyDark, 1);
+      g.fillCircle(0, 0, size + 3);
+      g.fillStyle(enemy, 1);
+      g.fillCircle(0, 0, size);
+      g.fillStyle(0x5a3a24, 1);
+      g.fillCircle(0, 0, size * 0.62);
+      g.fillStyle(0xc99a6b, 1);
+      g.fillCircle(size * 0.32, -size * 0.08, size * 0.55);
+      g.fillStyle(0x4a3120, 1);
+      g.fillEllipse(size * 0.3, -size * 0.08, size * 1.45, size * 0.48);
+      g.fillStyle(0x3a2618, 1);
+      g.fillRoundedRect(size * 0.02, -size * 0.42, size * 0.6, size * 0.36, 3);
+      g.lineStyle(3, 0x2a1a10, 1);
+      g.lineBetween(size * 0.5, 0, size + 12, 0);
+      g.fillStyle(0xd9c8a8, 1);
+      g.fillCircle(size + 12, 0, 2);
+      g.fillStyle(0xffd24d, 1);
+      g.fillCircle(-size * 0.35, size * 0.45, 2);
+      g.lineStyle(2, 0x2e1c0e, 1);
+      g.strokeCircle(0, 0, size + 3);
+      g.fillStyle(0x6b4a2a, 1);
+      g.fillRoundedRect(-size * 1.7, size * 0.75, size * 0.9, size * 0.55, 3);
+      g.lineStyle(1, 0x3a2414, 1);
+      g.strokeRoundedRect(-size * 1.7, size * 0.75, size * 0.9, size * 0.55, 3);
     } else {
       g.fillStyle(enemyDark, 1);
       g.fillCircle(0, 0, size + 3);
@@ -514,8 +563,52 @@ MB.art = (function () {
     return container;
   }
 
+  function drawWesternUnit(scene, kind, def) {
+    const container = scene.add.container(0, 0);
+    const g = scene.add.graphics();
+    const size = def.size;
+
+    g.fillStyle(0x000000, 0.22);
+    g.fillEllipse(2, size * 0.5, (size + 8) * 2, size * 0.7);
+
+    g.fillStyle(0x2a1a10, 1);
+    g.fillCircle(0, 0, size + 2);
+    g.fillStyle(def.color, 1);
+    g.fillCircle(0, 0, size);
+    g.fillStyle(0x3a2418, 0.9);
+    g.fillTriangle(-size, size * 0.35, 0, size * 0.95, size, size * 0.35);
+
+    g.fillStyle(0xc99a6b, 1);
+    g.fillCircle(size * 0.35, -size * 0.05, size * 0.55);
+    g.fillStyle(0x4a3120, 1);
+    g.fillEllipse(size * 0.3, -size * 0.08, size * 1.35, size * 0.9);
+    g.fillStyle(0x5a3f2a, 1);
+    g.fillCircle(size * 0.3, -size * 0.08, size * 0.4);
+    g.fillStyle(def.accent, 1);
+    g.fillRect(size * 0.05, size * 0.18, size * 0.6, 2.5);
+
+    if (kind === "landsknecht") {
+      g.fillStyle(0xffd24d, 1);
+      g.fillCircle(-size * 0.3, size * 0.35, 2.6);
+      g.fillStyle(0x7a5a10, 1);
+      g.fillCircle(-size * 0.3, size * 0.35, 1);
+    } else {
+      g.lineStyle(2, 0xd9c8a8, 0.9);
+      g.lineBetween(-size * 0.65, -size * 0.25, size * 0.35, size * 0.35);
+    }
+
+    g.lineStyle(3, 0x2a1a10, 1);
+    g.lineBetween(size * 0.45, 0, size + 12, 0);
+    g.fillStyle(0xd9c8a8, 1);
+    g.fillCircle(size + 12, 0, 2);
+
+    container.add(g);
+    return container;
+  }
+
   function drawUnit(scene, kind, def, style) {
     if (style === "stoneage") return drawStoneAgeUnit(scene, kind, def);
+    if (style === "western") return drawWesternUnit(scene, kind, def);
 
     const container = scene.add.container(0, 0);
     const g = scene.add.graphics();
@@ -671,6 +764,20 @@ MB.art = (function () {
     return container;
   }
 
+  function drawBullet(scene, x, y, color) {
+    const container = scene.add.container(x, y);
+    const g = scene.add.graphics();
+    const tint = color == null ? 0xffe6a8 : color;
+    g.fillStyle(tint, 0.25);
+    g.fillCircle(-7, 0, 3.2);
+    g.fillStyle(tint, 1);
+    g.fillRect(-7, -1.5, 13, 3);
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(1, -0.8, 4, 1.6);
+    container.add(g);
+    return container;
+  }
+
   return {
     drawMap: drawMap,
     drawMiniMap: drawMiniMap,
@@ -679,6 +786,7 @@ MB.art = (function () {
     drawDino: drawDino,
     drawUnit: drawUnit,
     drawStone: drawStone,
+    drawBullet: drawBullet,
     rng: rng
   };
 })();

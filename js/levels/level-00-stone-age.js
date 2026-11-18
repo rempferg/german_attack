@@ -5,8 +5,8 @@ MB.Levels.define({
   id: "stone-age",
   number: 1,
   name: "Stone Age",
-  subtitle: "Ferns, boulders and very hungry dinosaurs.",
-  brief: "Pelt the dinos with stones until they flee.",
+  subtitle: "Ferns, boulders and hungry dinos.",
+  brief: "Pelt the dinos until they flee.",
   seed: 7,
 
   // Stone Age reskin of the same two unit roles.

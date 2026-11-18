@@ -13,7 +13,7 @@ and `y = 430`. The player camp is normally on the left.
 ```js
 MB.Levels.define({
   id: "my-road",                 // unique, never change after release
-  number: 4,                     // unlock order
+  number: 5,                     // unlock order
   name: "My Road",
   subtitle: "A short description for the map select card.",
   brief: "Shown under the level name during play.",
@@ -47,9 +47,10 @@ MB.Levels.define({
   playerArea: { x: 10, y: 50, w: 130, h: 370 },
 
   // Optional per-level presentation.
-  unitStyle: "stoneage",         // "stoneage" draws cavemen; omit for default
+  unitStyle: "stoneage",         // "stoneage" or "western"; omit for default
   unitNames: { landsknecht: "Clubman", archer: "Slinger" },
-  playerProjectile: "stone",     // omit for energy bolts
+  playerProjectile: "stone",     // "stone", "bullet" or omit for energy bolts
+  enemyProjectile: "bullet",     // optional, same values
   enemyWord: { one: "Dino", many: "Dinos", verb: "routed" },
   battleLine: "Keep throwing stones until the dinos run away!",
 
@@ -97,29 +98,30 @@ MB.Levels.define({
 | `pathWidth` | no | Road width in pixels, default 36. |
 | `playerArea` | no | Camp rectangle; defaults to the left strip. |
 | `treasure` | yes | Chest centre position. |
-| `defenses` | no | Array of towers, ballistae or dinos. |
+| `defenses` | no | Array of towers, ballistae, bandits or dinos. |
 | `scenery` | no | Array of decorative props. |
 | `startingSupply` | no | Supply the player starts with, default 0. |
-| `unitStyle` | no | `"stoneage"` reskins soldiers as cavemen. |
+| `unitStyle` | no | `"stoneage"` or `"western"` reskins soldiers. |
 | `unitNames` | no | Per-unit display names, e.g. `{ landsknecht: "Clubman" }`. |
-| `playerProjectile` | no | `"stone"` makes player shots throw rocks. |
+| `playerProjectile` | no | `"stone"` or `"bullet"` changes player shots. |
+| `enemyProjectile` | no | `"stone"` or `"bullet"` changes enemy shots. |
 | `enemyWord` | no | Labels for the HUD/stats: `{ one, many, verb }`. |
 | `battleLine` | no | Objective line shown in the bottom bar during battle. |
 
 ## Defenses and dinos
 
-`type` is `tower`, `ballista`, `raptor`, `stego` or `trex`. Base stats live in
-`js/config.js` under `MB.config.DEFENSES` and `MB.config.DINOS`; any stat can be
-overridden per placement:
+`type` is `tower`, `ballista`, `bandit`, `raptor`, `stego` or `trex`. Base
+stats live in `js/config.js` under `MB.config.DEFENSES` and `MB.config.DINOS`;
+any stat can be overridden per placement:
 
 ```js
 { type: "tower", x: 300, y: 250, hp: 240, damage: 12, range: 200 }
 { type: "raptor", x: 420, y: 300, fleeAfter: 5 }
 ```
 
-Towers and ballistae stand still and shoot. Place them roughly 50-120 px from a
-road segment; their range is measured from the structure, so one between two
-road segments covers both.
+Towers, ballistae and bandits stand still and shoot. Place them roughly 50-120
+px from a road segment; their range is measured from the structure, so one
+between two road segments covers both.
 
 Dinos are mobile:
 
@@ -144,6 +146,7 @@ Built-in procedural types:
 - `fern`
 - `bones`
 - `campfire`
+- `cactus`
 
 Each accepts `x`, `y`, optional `scale`, and `rotation` for textured props.
 
@@ -162,7 +165,7 @@ drawn as a fallback. Add a new procedural type by adding a case in
 
 ## Adding a level
 
-1. Copy `js/levels/level-01.js` to a new file and change `id`, `number`, path,
+1. Copy `js/levels/level-01-high-noon.js` to a new file and change `id`, `number`, path,
    theme, defenses and scenery.
 2. Add one `<script>` tag in `index.html` after `js/levels/core.js` and before
    `js/art.js`.
@@ -170,7 +173,7 @@ drawn as a fallback. Add a new procedural type by adding a case in
 
 No scene code changes are needed. Extra levels beyond four get pagination in
 the map select automatically. Keep `number` unique; the existing maps are
-Stone Age (1), The Old Road (2) and Amber Pass (3).
+Stone Age (1), High Noon (2), The Old Road (3) and Amber Pass (4).
 
 ## Improving the graphics
 
@@ -179,7 +182,7 @@ The art layer is deliberately separate:
 - `background` plus `skipGround` gives a hand-painted ground while the engine
   keeps drawing the functional road, camp and treasure.
 - `preload` + `texture` replaces individual scenery props.
-- `js/art.js` holds the drawing code for units, towers, ballistae, the camp,
+- `js/art.js` holds the drawing code for units, towers, bandits, dinos, the camp,
   the chest and the generated ground. Replace those functions to change the
   look globally without touching level data.
 
@@ -194,6 +197,7 @@ Unit and enemy stats are in `js/config.js`:
 - `MB.config.UNITS.archer`
 - `MB.config.DEFENSES.tower`
 - `MB.config.DEFENSES.ballista`
+- `MB.config.DEFENSES.bandit`
 - `MB.config.DINOS.raptor`
 - `MB.config.DINOS.stego`
 - `MB.config.DINOS.trex`

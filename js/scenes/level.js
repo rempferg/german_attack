@@ -596,9 +596,19 @@ MB.Scenes.Level = new Phaser.Class({
   fireProjectile: function (source, target, side) {
     const isPlayer = side === "player";
     const stone = isPlayer && this.level.playerProjectile === "stone";
+    const bullet = (isPlayer && this.level.playerProjectile === "bullet") ||
+      (!isPlayer && this.level.enemyProjectile === "bullet");
     let g;
     if (stone) {
       g = MB.art.drawStone(this, source.x, source.y).setDepth(20);
+    } else if (bullet) {
+      g = MB.art.drawBullet(
+        this,
+        source.x,
+        source.y,
+        isPlayer ? 0xffe6a8 : 0xffb36b
+      ).setDepth(20);
+      g.setRotation(Math.atan2(target.y - source.y, target.x - source.x));
     } else {
       g = this.add.circle(
         source.x,
@@ -617,6 +627,7 @@ MB.Scenes.Level = new Phaser.Class({
       damage: source.damage,
       side: side,
       stone: stone,
+      bullet: bullet,
       spin: stone ? (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 3) : 0,
       speed: isPlayer ? 520 : (source.projectileSpeed || 320)
     });
@@ -653,6 +664,7 @@ MB.Scenes.Level = new Phaser.Class({
         p.y += (dy / dist) * step;
         p.g.setPosition(p.x, p.y);
         if (p.spin) p.g.rotation += p.spin * dtSec;
+        if (p.bullet) p.g.setRotation(Math.atan2(dy, dx));
         survivors.push(p);
       }
     }

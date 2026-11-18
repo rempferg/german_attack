@@ -3,25 +3,27 @@
 A top-down German-learning campaign game built with Phaser 3.
 
 Answer German questions to earn supply. Spend supply on a marching army, send
-it down the road, and fight your way past towers, ballistae and dinosaurs to
-the treasure. Clearing a map unlocks the next one.
+it down the road, and fight your way past towers, ballistae, outlaws and
+dinosaurs to the treasure. Clearing a map unlocks the next one.
 
-The game ships with three levels:
+The game ships with four levels:
 
 | # | Level | Map |
 | - | ----- | --- |
 | 1 | Stone Age | Savannah, cavemen and four dinosaurs |
-| 2 | The Old Road | Green fields, five defenses |
-| 3 | Amber Pass | Autumn woods, six defenses |
+| 2 | High Noon | Desert outlaws, pistols and bullets |
+| 3 | The Old Road | Green fields, five defenses |
+| 4 | Amber Pass | Autumn woods, six defenses |
 
 ## How to play
 
 1. Press **ANSWER GERMAN** and answer as many questions as you like. Each
    correct answer earns **1 supply**.
-2. Spend supply on units. The roles are the same in every level; the Stone Age
-   map calls them **Clubman** and **Slinger**:
-   - **Landsknecht / Clubman** - 1 supply, 140 HP, 10 DPS. Sturdy frontline.
-   - **Archer / Slinger** - 3 supply, 70 HP, 34 DPS. Fragile, more damage.
+2. Spend supply on units. The roles are the same in every level; levels reskin
+   them:
+   - **Landsknecht / Clubman / Deputy** - 1 supply, 140 HP, 10 DPS. Sturdy.
+   - **Archer / Slinger / Gunslinger** - 3 supply, 70 HP, 34 DPS. Fragile,
+     more damage.
 
    Each purchase appears in your camp immediately. Press **ATTACK** to send
    the whole army down the road.
@@ -81,8 +83,9 @@ js/german.js                   German question bank (152 questions)
 js/save.js                     cleared-map progress in localStorage
 js/levels/core.js              level registry and path geometry
 js/levels/level-00-stone-age.js  Stone Age
-js/levels/level-01.js          The Old Road
-js/levels/level-02.js          Amber Pass
+js/levels/level-01-high-noon.js  High Noon
+js/levels/level-02-old-road.js   The Old Road
+js/levels/level-03-amber-pass.js Amber Pass
 js/scenes/menu.js              title screen
 js/scenes/levels.js            map select and unlocking
 js/scenes/level.js             map, army training, marching battle
@@ -101,10 +104,11 @@ its own path, enemies, scenery, colours, unit names and treasure position. Add
 the file to `index.html` and it appears in the map select; the next level
 unlocks by `number` order.
 
-Enemy entries in `defenses` can be structures (`tower`, `ballista`) or dinos
-(`raptor`, `stego`, `trex`). Dinos walk toward nearby soldiers to bite them and
-flee after `fleeAfter` stone hits. A level can set `unitStyle: "stoneage"` to
-reskin soldiers and `playerProjectile: "stone"` to throw rocks.
+Enemy entries in `defenses` can be structures (`tower`, `ballista`), bandits
+(`bandit`) or dinos (`raptor`, `stego`, `trex`). Dinos walk toward nearby
+soldiers to bite them and flee after `fleeAfter` stone hits. A level can set
+`unitStyle` to `"stoneage"` or `"western"` to reskin soldiers, and
+`playerProjectile` / `enemyProjectile` to `"stone"` or `"bullet"`.
 
 See [LEVELS.md](LEVELS.md) for the full schema and a minimal example.
 

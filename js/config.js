@@ -11,7 +11,7 @@ MB.config = (function () {
   // Appended to asset URLs by the Dockerfile. Bump it whenever js/, style.css
   // or fonts/ change, because those files are served with a one-year immutable
   // cache while index.html itself is never cached.
-  const VERSION = "V5";
+  const VERSION = "V6";
 
   // Supply is earned by answering German questions. Units spend it, so a unit
   // that costs 3 needs three correct answers before it can be trained.
@@ -70,6 +70,16 @@ MB.config = (function () {
       projectileSpeed: 380,
       size: 26,
       color: 0x8a5a32
+    },
+    bandit: {
+      name: "Outlaw",
+      hp: 140,
+      damage: 9,
+      range: 205,
+      fireRate: 1100,
+      projectileSpeed: 480,
+      size: 16,
+      color: 0x6a3a2a
     }
   };
 
